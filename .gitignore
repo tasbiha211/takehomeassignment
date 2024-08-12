@@ -1,0 +1,5 @@
+# Ignore the myenv directory
+myenv/
+
+# Ignore the steps.txt file
+steps.txt
