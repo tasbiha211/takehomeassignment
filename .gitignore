@@ -1,7 +1,8 @@
 # Ignore the myenv directory
 myenv/
 spark-warehouse/
-user
+user/
 
 # Ignore the steps.txt file
 steps.txt
+notebook.ipynb
