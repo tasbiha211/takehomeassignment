@@ -2,18 +2,10 @@
 
 # PySpark Application
 
-Pyspark Application Solution to Assignment description provided in the file. Please refer to the file Edge Cases Explanations for more explanation on identified edge cases. 
+This repository contains a PySpark application that solves the assignment problem described in `de_take_home_test.pdf`. The application processes data to identify users who registered one week before the application was loaded. Please refer to `Edge Cases Explanation.pdf` for more detailed explanations of these edge cases.
+
 
 ## Getting Started
-
-### Prerequisites
-
-Before you can run the application, ensure you have the following installed on your system:
-
-- **Python 3.7 or later:** You can download it from the [official Python website](https://www.python.org/downloads/).
-- **Java:** Spark requires Java 8 or later. You can download it from the [official Oracle website](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) or use a package manager.
-- **Apache Spark:** Spark is included with PySpark, but make sure Java is properly set up for it.
-- **pip:** The Python package installer. It usually comes with Python, but you can install it separately if needed.
 
 ### Setting Up the Environment
 
@@ -47,7 +39,3 @@ Statistics Mode: Computes statistics such as the percentage of users who registe
 4. **Running Unit Tests:**
     ```bash
     python3 -m unittest tests.py
-
-
-
-
