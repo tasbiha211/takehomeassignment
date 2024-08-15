@@ -1,3 +1,4 @@
+import sys
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType,BooleanType,DoubleType
 from pyspark.sql.functions import col, weekofyear, year
@@ -23,14 +24,28 @@ def parse(session, dataset_path):
     registered_events.write.mode("overwrite").parquet("user/events/registered/")
 
 query = """
-    SELECT DISTINCT r.initiator_id
-    FROM registered r
-    JOIN apploaded a
-    ON r.initiator_id = a.initiator_id
-    AND 
-    ((r.year = a.year AND r.week_of_year = a.week_of_year-1)
-    OR (r.year = a.year + 1 AND (r.week_of_year = 1 AND a.week_of_year = 53)))
-
+SELECT DISTINCT r.initiator_id
+FROM registered r
+JOIN apploaded a
+ON r.initiator_id = a.initiator_id
+AND (
+    -- Same year, consecutive weeks
+    (r.year = a.year AND r.week_of_year = a.week_of_year - 1)
+    
+    -- Year transition: registration in the last week of the year
+    OR (r.year = a.year - 1 AND (
+        -- Handling transitions from 53 -> 1
+        (r.week_of_year = 53 AND a.week_of_year = 1)
+        -- Handling transitions from 52 -> 1
+        OR (r.week_of_year = 52 AND a.week_of_year = 1)
+        -- Handling transitions from 51 -> 1
+        OR (r.week_of_year = 51 AND a.week_of_year = 1)
+        -- Handling transition from 51 -> 52 in case of long year weeks
+        OR (r.week_of_year = 51 AND a.week_of_year = 52)
+        -- Handling transition from 52 -> 53 in case of long year weeks
+        OR (r.week_of_year = 52 AND a.week_of_year = 53)
+    ))
+)
     """
 
 query2 = '''
@@ -61,17 +76,37 @@ def statistics(session):
 
     return percentage
 
-session = SparkSession.builder.appName("Running PySpark Application....")\
-.master("local[*]")\
-.getOrCreate()
 
-print(session.sparkContext.appName)
 
-'''Parse Mode'''
-print("***PARSE MODE***")
-dataset_path = "dataset.json"
-parse(session, dataset_path)
+def main(dataset_path):
+    """
+    Main entry point of the application.
+    """
+    # Initialize SparkSession
+    session = SparkSession.builder \
+        .appName("Running PySpark Application....") \
+        .master("local[*]") \
+        .getOrCreate()
 
-'''Statistics Mode'''
-print("***STATISTICS MODE***")
-print("Percentage of Users who registered one week after loading the application: ", statistics(session))
+    # Print Spark application name
+    print(session.sparkContext.appName)
+
+    # Parse Mode
+    print("***PARSE MODE***")
+    parse(session, dataset_path)
+
+    # Statistics Mode
+    print("***STATISTICS MODE***")
+    percentage = statistics(session)
+    print("Percentage of Users who registered one week after loading the application: ", percentage, "%")
+
+    # Stop the SparkSession
+    session.stop()
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python3 app.py <dataset_path>")
+        sys.exit(1)
+
+    dataset_path = sys.argv[1]
+    main(dataset_path)
