@@ -14,8 +14,8 @@ This repository contains a PySpark application that solves the assignment proble
    Clone this repository to your local machine using:
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/tasbiha211/takehomeassignment.git
+   cd takehomeassignment
    python3 -m venv venv
 source venv/bin/activate   # On Windows use `venv\Scripts\activate`
 
